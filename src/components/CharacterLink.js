@@ -1,36 +1,26 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { getCharacterById, parseCharacterId } from "../services/characterApi";
+import React, { useCallback } from "react";
 import { Button } from "antd";
+import { dispatch } from "use-bus";
+
+import { getCharacterById, parseCharacterId } from "../services/characterApi";
+import useFetch from "../hooks/useFetch";
 
 const CharacterLink = ({ link }) => {
-  const [characterData, setCharacterData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const { payload, loading } = useFetch(
+    getCharacterById,
+    parseCharacterId(link)
+  );
+  const { data: character } = payload || {};
 
-  const fetchData = useCallback(async (id) => {
-    setLoading(true);
+  const handleClick = useCallback(() => {
+    if (!character) return;
 
-    try {
-      const resp = await getCharacterById(id);
-      setCharacterData(resp.data);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!link) return;
-    fetchData(parseCharacterId(link));
-  }, [link, fetchData]);
-
-  if (!characterData) return null;
+    dispatch({ type: "CHARACTER_SELECTED", payload: character?.id });
+  }, [character]);
 
   return (
-    <Button
-      type="link"
-      href={`/characters/${characterData.id}`}
-      loading={loading}
-    >
-      {characterData.name}
+    <Button type="link" onClick={handleClick} loading={loading}>
+      {character?.name || "Unknown"}
     </Button>
   );
 };

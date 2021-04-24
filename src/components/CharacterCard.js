@@ -1,16 +1,19 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Card, Avatar, Skeleton } from "antd";
 import CharacterCardDescription from "./CharacterCardDescription";
+import { dispatch } from "use-bus";
 
 const { Meta } = Card;
 
-const CharacterCard = ({ character, onSelect, loading }) => {
+const CharacterCard = ({ character, loading }) => {
+  const handleClick = useCallback(() => {
+    if (!character) return;
+
+    dispatch({ type: "CHARACTER_SELECTED", payload: character?.id });
+  }, [character]);
+
   return (
-    <Card
-      style={{ width: 350 }}
-      onClick={() => onSelect?.(character?.id)}
-      hoverable
-    >
+    <Card style={{ width: 350 }} onClick={handleClick} hoverable>
       <Skeleton loading={loading} avatar active>
         {character && (
           <Meta

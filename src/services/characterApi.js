@@ -29,8 +29,10 @@ export const searchCharacters = (params) => {
     params,
   }).then((resp) => {
     return {
-      data: processCharacterList(resp.data),
-      lastPage: parseLastPage(resp.headers.link),
+      data: {
+        characters: processCharacterList(resp.data),
+        lastPage: parseLastPage(resp.headers.link),
+      },
     };
   });
 };

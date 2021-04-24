@@ -1,46 +1,47 @@
-import { useState, useEffect, useCallback } from "react";
-import { PageHeader, Input, Pagination } from "antd";
-import { useDebouncedCallback } from "use-debounce";
+import { useState } from "react";
+import { PageHeader, Input, Pagination, Drawer } from "antd";
+
+import useFetch from "../hooks/useFetch";
 
 import { searchCharacters } from "../services/characterApi";
 import CharacterList from "../components/CharacterList";
 import CharacterDetail from "../components/CharacterDetail";
+import useBus from "use-bus";
+import HouseDetail from "../components/HouseDetail";
 
 const { Search } = Input;
 
 const CharacterPage = () => {
-  const [chars, setChars] = useState([]);
-  const [searchParams, setSearchParams] = useState({ page: 1, pageSize: 10 });
-  const [lastPage, setLastPage] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [searchParams, setSearchParams] = useState({
+    name: "",
+    page: 1,
+    pageSize: 10,
+  });
   const [selected, setSelected] = useState(null);
+  const [selHouse, setSelHouse] = useState(null);
+  const { payload, isLoading: loading } = useFetch(
+    searchCharacters,
+    searchParams
+  );
+  const {
+    data: { characters, lastPage = 0 },
+  } = payload || { data: {} };
 
-  const { page, pageSize } = searchParams;
-
-  const fetchData = useCallback(
-    async (search) => {
-      setLoading(true);
-      try {
-        const { data, lastPage } = await searchCharacters({
-          name: search,
-          page,
-          pageSize,
-        });
-
-        setLastPage(lastPage);
-        setChars(data);
-      } finally {
-        setLoading(false);
-      }
+  useBus(
+    "CHARACTER_SELECTED",
+    (event) => {
+      setSelected(event.payload);
     },
-    [page, pageSize]
+    [setSelected]
   );
 
-  useEffect(() => {
-    fetchData("");
-  }, [fetchData]);
-
-  const handleSearchChange = useDebouncedCallback(fetchData, 500);
+  useBus(
+    "HOUSE_SELECTED",
+    (event) => {
+      setSelHouse(event.payload);
+    },
+    [setSelHouse]
+  );
 
   return (
     <div>
@@ -54,31 +55,49 @@ const CharacterPage = () => {
           placeholder="Search Characters By Name"
           allowClear
           enterButton="Search"
-          onSearch={handleSearchChange}
+          onSearch={(name) =>
+            setSearchParams({ ...searchParams, name, page: 1 })
+          }
           loading={loading}
         />
         <div style={{ padding: "20px 0px" }}>
           <CharacterList
-            characters={chars}
+            characters={characters}
             loading={loading}
-            pageSize={pageSize}
+            pageSize={searchParams.pageSize}
           />
         </div>
         <Pagination
-          onChange={(value) =>
-            setSearchParams({ ...searchParams, page: value })
+          onChange={(page, pageSize) =>
+            setSearchParams({
+              ...searchParams,
+              page: searchParams.pageSize !== pageSize ? 1 : page,
+              pageSize,
+            })
           }
-          total={lastPage * pageSize}
-          current={page}
-          defaultCurrent={1}
-          defaultPageSize={10}
-          onShowSizeChange={(page, size) =>
-            setSearchParams({ ...searchParams, pageSize: size })
-          }
+          total={lastPage * searchParams.pageSize}
+          current={searchParams.page}
+          pageSizeOptions={[10, 20, 50]}
         />
-        {selected && (
-          <CharacterDetail id={selected} onClose={() => setSelected(null)} />
-        )}
+        <Drawer
+          width={640}
+          visible={!!selected}
+          onClose={() => setSelected(null)}
+          mask={false}
+        >
+          <PageHeader title="Character Detail" />
+          {selected && <CharacterDetail id={selected} />}
+        </Drawer>
+        <Drawer
+          width={640}
+          placement="left"
+          visible={!!selHouse}
+          onClose={() => setSelHouse(null)}
+          mask={false}
+        >
+          <PageHeader title="House Detail" />
+          {selHouse && <HouseDetail id={selHouse} />}
+        </Drawer>
       </div>
     </div>
   );

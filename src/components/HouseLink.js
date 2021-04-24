@@ -1,32 +1,23 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { getHouseById, parseHouseId } from "../services/houseApi";
+import React, { useCallback } from "react";
 import { Button } from "antd";
+import { dispatch } from "use-bus";
+
+import { getHouseById, parseHouseId } from "../services/houseApi";
+import useFetch from "../hooks/useFetch";
 
 const HouseLink = ({ link }) => {
-  const [houseData, setHouseData] = useState(null);
-  const [loading, setLoading] = useState();
+  const { payload, loading } = useFetch(getHouseById, parseHouseId(link));
+  const { data: house } = payload || {};
 
-  const fetchData = useCallback(async (id) => {
-    setLoading(true);
+  const handleClick = useCallback(() => {
+    if (!house) return;
 
-    try {
-      const resp = await getHouseById(id);
-      setHouseData(resp.data);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!link) return;
-    fetchData(parseHouseId(link));
-  }, [link, fetchData]);
-
-  if (!houseData) return null;
+    dispatch({ type: "HOUSE_SELECTED", payload: house?.id });
+  }, [house]);
 
   return (
-    <Button type="link" href={`/houses/${houseData.id}`} loading={loading}>
-      {houseData.name}
+    <Button type="link" onClick={handleClick} loading={loading}>
+      {house?.name}
     </Button>
   );
 };

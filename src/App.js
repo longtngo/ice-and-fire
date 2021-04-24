@@ -16,7 +16,7 @@ function App() {
       <Content className="content-container">
         <CharacterPage />
       </Content>
-      <Footer>Footer</Footer>
+      <Footer>Long Ngo - {new Date().getFullYear()}</Footer>
     </Layout>
   );
 }
