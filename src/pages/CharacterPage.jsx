@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageHeader, Input, Pagination, Drawer } from "antd";
 import useBus from "use-bus";
 import { useTitle } from "hookrouter";
@@ -6,15 +6,15 @@ import { useTitle } from "hookrouter";
 import useFetch from "../hooks/useFetch";
 import { searchCharacters } from "../services/characterApi";
 import CharacterDetail from "../components/CharacterDetail";
-import HouseDetail from "../components/HouseDetail";
 import withList from "../components/shared/withList";
 import CharacterCard from "../components/CharacterCard";
+import { navigate } from "hookrouter";
 
 const CharacterList = withList(CharacterCard);
 
 const { Search } = Input;
 
-const CharacterPage = () => {
+const CharacterPage = ({ id }) => {
   useTitle("Characters Page");
   const [searchParams, setSearchParams] = useState({
     name: "",
@@ -22,7 +22,6 @@ const CharacterPage = () => {
     pageSize: 10,
   });
   const [selected, setSelected] = useState(null);
-  const [selHouse, setSelHouse] = useState(null);
   const { payload, isLoading: loading } = useFetch(
     searchCharacters,
     searchParams
@@ -31,20 +30,18 @@ const CharacterPage = () => {
     data: { characters, lastPage = 0 },
   } = payload || { data: {} };
 
+  useEffect(() => {
+    if (id) {
+      setSelected(id);
+    }
+  }, [id]);
+
   useBus(
     "CHARACTER_SELECTED",
     (event) => {
-      setSelected(event.payload);
+      navigate(`characters/${event.payload}`);
     },
     [setSelected]
-  );
-
-  useBus(
-    "HOUSE_SELECTED",
-    (event) => {
-      setSelHouse(event.payload);
-    },
-    [setSelHouse]
   );
 
   return (
@@ -86,17 +83,9 @@ const CharacterPage = () => {
           mask={false}
         >
           <PageHeader title="Character Detail" />
-          {selected && <CharacterDetail id={selected} />}
-        </Drawer>
-        <Drawer
-          width={640}
-          placement="left"
-          visible={!!selHouse}
-          onClose={() => setSelHouse(null)}
-          mask={false}
-        >
-          <PageHeader title="House Detail" />
-          {selHouse && <HouseDetail id={selHouse} />}
+          {selected && (
+            <CharacterDetail id={selected} houseLinkMode="navButton" />
+          )}
         </Drawer>
       </div>
     </div>

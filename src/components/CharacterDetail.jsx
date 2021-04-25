@@ -8,7 +8,7 @@ import { renderArray } from "./shared/helper";
 
 const { Meta } = Card;
 
-const CharacterDetail = ({ id }) => {
+const CharacterDetail = ({ id, characterLinkMode, houseLinkMode }) => {
   const { payload, loading } = useFetch(getCharacterById, id);
   const { data: character } = payload || {};
 
@@ -44,17 +44,32 @@ const CharacterDetail = ({ id }) => {
               character.allegiances
                 .filter((link) => !!link)
                 .map((houseLink, idx) => (
-                  <HouseLink link={houseLink} key={idx} />
+                  <HouseLink mode={houseLinkMode} link={houseLink} key={idx} />
                 ))}
           </Descriptions.Item>
           <Descriptions.Item label="Father">
-            {character.father && <CharacterLink link={character.father} />}
+            {character.father && (
+              <CharacterLink
+                characterLinkMode={characterLinkMode}
+                link={character.father}
+              />
+            )}
           </Descriptions.Item>
           <Descriptions.Item label="Mother">
-            {character.mother && <CharacterLink link={character.mother} />}
+            {character.mother && (
+              <CharacterLink
+                characterLinkMode={characterLinkMode}
+                link={character.mother}
+              />
+            )}
           </Descriptions.Item>
           <Descriptions.Item label="Spouse">
-            {character.spouse && <CharacterLink link={character.spouse} />}
+            {character.spouse && (
+              <CharacterLink
+                characterLinkMode={characterLinkMode}
+                link={character.spouse}
+              />
+            )}
           </Descriptions.Item>
           <Descriptions.Item label="Played By" span={2}>
             {renderArray(character.playedBy)}

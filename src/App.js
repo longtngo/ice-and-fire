@@ -10,7 +10,9 @@ const { Footer, Content } = Layout;
 
 const routes = {
   "/characters": () => <CharacterPage />,
+  "/characters/:id": (params) => <CharacterPage id={params?.id} />,
   "/houses": () => <HousePage />,
+  "/houses/:id": (params) => <HousePage id={params?.id} />,
 };
 
 function App() {

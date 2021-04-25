@@ -5,8 +5,9 @@ import { dispatch } from "use-bus";
 import { getCharacterById, characterIdPattern } from "../services/characterApi";
 import useFetch from "../hooks/useFetch";
 import { parseId } from "../services/common";
+import NavButton from "./NavButton";
 
-const CharacterLink = ({ link }) => {
+const CharacterLink = ({ link, mode }) => {
   const { payload, loading } = useFetch(
     getCharacterById,
     parseId(link, characterIdPattern)
@@ -19,9 +20,22 @@ const CharacterLink = ({ link }) => {
     dispatch({ type: "CHARACTER_SELECTED", payload: character?.id });
   }, [character]);
 
+  const name = character?.name || "Unknown";
+  if (mode === "navButton") {
+    return (
+      <NavButton
+        type="link"
+        href={`/characters/${character?.id}`}
+        loading={loading}
+      >
+        {name}
+      </NavButton>
+    );
+  }
+
   return (
     <Button type="link" onClick={handleClick} loading={loading}>
-      {character?.name || "Unknown"}
+      {name}
     </Button>
   );
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PageHeader, Input, Pagination, Drawer } from "antd";
 import useBus from "use-bus";
 import { useTitle } from "hookrouter";
@@ -8,11 +8,12 @@ import { searchHouses } from "../services/houseApi";
 import HouseDetail from "../components/HouseDetail";
 import HouseCard from "../components/HouseCard";
 import withList from "../components/shared/withList";
+import { navigate } from "hookrouter";
 
 const HouseList = withList(HouseCard);
 const { Search } = Input;
 
-const HousePage = () => {
+const HousePage = ({ id }) => {
   useTitle("Houses Page");
   const [searchParams, setSearchParams] = useState({
     name: "",
@@ -25,10 +26,16 @@ const HousePage = () => {
     data: { houses, lastPage = 0 },
   } = payload || { data: {} };
 
+  useEffect(() => {
+    if (id) {
+      setSelected(id);
+    }
+  }, [id]);
+
   useBus(
     "HOUSE_SELECTED",
     (event) => {
-      setSelected(event.payload);
+      navigate(`houses/${event.payload}`);
     },
     [setSelected]
   );
@@ -72,7 +79,9 @@ const HousePage = () => {
           mask={false}
         >
           <PageHeader title="House Detail" />
-          {selected && <HouseDetail id={selected} />}
+          {selected && (
+            <HouseDetail id={selected} characterLinkMode="navButton" />
+          )}
         </Drawer>
       </div>
     </div>
