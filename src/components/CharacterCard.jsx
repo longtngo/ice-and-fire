@@ -5,30 +5,30 @@ import { dispatch } from "use-bus";
 
 const { Meta } = Card;
 
-const CharacterCard = ({ character, loading }) => {
+const CharacterCard = ({ data, loading }) => {
   const handleClick = useCallback(() => {
-    if (!character) return;
+    if (!data) return;
 
-    dispatch({ type: "CHARACTER_SELECTED", payload: character?.id });
-  }, [character]);
+    dispatch({ type: "CHARACTER_SELECTED", payload: data?.id });
+  }, [data]);
 
   return (
     <Card style={{ width: 350 }} onClick={handleClick} hoverable>
       <Skeleton loading={loading} avatar active>
-        {character && (
+        {data && (
           <Meta
             avatar={
               <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
             }
-            title={character.name || "Unknown"}
+            title={data.name || "Unknown"}
             description={
               <div>
                 <CharacterCardDescription
-                  values={character.titles}
+                  values={data.titles}
                   fieldName="Title"
                 />
                 <CharacterCardDescription
-                  values={character.aliases}
+                  values={data.aliases}
                   fieldName="Alias"
                   plural="es"
                 />

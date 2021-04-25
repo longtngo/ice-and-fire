@@ -1,20 +1,26 @@
 import "./App.css";
-import { Layout, Menu } from "antd";
+import { Layout } from "antd";
 import CharacterPage from "./pages/CharacterPage";
+import { useRoutes, useRedirect } from "hookrouter";
+import HousePage from "./pages/HousePage";
+import NotFoundPage from "./pages/NotFoundPage";
+import TopNav from "./components/TopNav";
 
-const { Header, Footer, Content } = Layout;
+const { Footer, Content } = Layout;
+
+const routes = {
+  "/characters": () => <CharacterPage />,
+  "/houses": () => <HousePage />,
+};
 
 function App() {
+  useRedirect("/", "/characters");
+  const routeResult = useRoutes(routes);
   return (
     <Layout>
-      <Header>
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={["1"]}>
-          <Menu.Item key="1">Characters</Menu.Item>
-          <Menu.Item key="2">Houses</Menu.Item>
-        </Menu>
-      </Header>
+      <TopNav />
       <Content className="content-container">
-        <CharacterPage />
+        {routeResult || <NotFoundPage />}
       </Content>
       <Footer>Long Ngo - {new Date().getFullYear()}</Footer>
     </Layout>

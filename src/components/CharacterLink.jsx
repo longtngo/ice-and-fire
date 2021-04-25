@@ -2,13 +2,14 @@ import React, { useCallback } from "react";
 import { Button } from "antd";
 import { dispatch } from "use-bus";
 
-import { getCharacterById, parseCharacterId } from "../services/characterApi";
+import { getCharacterById, characterIdPattern } from "../services/characterApi";
 import useFetch from "../hooks/useFetch";
+import { parseId } from "../services/common";
 
 const CharacterLink = ({ link }) => {
   const { payload, loading } = useFetch(
     getCharacterById,
-    parseCharacterId(link)
+    parseId(link, characterIdPattern)
   );
   const { data: character } = payload || {};
 

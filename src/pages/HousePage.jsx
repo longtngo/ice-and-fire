@@ -4,59 +4,45 @@ import useBus from "use-bus";
 import { useTitle } from "hookrouter";
 
 import useFetch from "../hooks/useFetch";
-import { searchCharacters } from "../services/characterApi";
-import CharacterDetail from "../components/CharacterDetail";
+import { searchHouses } from "../services/houseApi";
 import HouseDetail from "../components/HouseDetail";
+import HouseCard from "../components/HouseCard";
 import withList from "../components/shared/withList";
-import CharacterCard from "../components/CharacterCard";
 
-const CharacterList = withList(CharacterCard);
-
+const HouseList = withList(HouseCard);
 const { Search } = Input;
 
-const CharacterPage = () => {
-  useTitle("Characters Page");
+const HousePage = () => {
+  useTitle("Houses Page");
   const [searchParams, setSearchParams] = useState({
     name: "",
     page: 1,
     pageSize: 10,
   });
   const [selected, setSelected] = useState(null);
-  const [selHouse, setSelHouse] = useState(null);
-  const { payload, isLoading: loading } = useFetch(
-    searchCharacters,
-    searchParams
-  );
+  const { payload, isLoading: loading } = useFetch(searchHouses, searchParams);
   const {
-    data: { characters, lastPage = 0 },
+    data: { houses, lastPage = 0 },
   } = payload || { data: {} };
 
   useBus(
-    "CHARACTER_SELECTED",
+    "HOUSE_SELECTED",
     (event) => {
       setSelected(event.payload);
     },
     [setSelected]
   );
 
-  useBus(
-    "HOUSE_SELECTED",
-    (event) => {
-      setSelHouse(event.payload);
-    },
-    [setSelHouse]
-  );
-
   return (
     <div>
       <PageHeader
         className="site-page-header"
-        title="Characters"
-        subTitle="List of all characters"
+        title="Houses"
+        subTitle="List of all houses"
       />
       <div className="page-content">
         <Search
-          placeholder="Search Characters By Name"
+          placeholder="Search Houses By Name"
           allowClear
           enterButton="Search"
           onSearch={(name) =>
@@ -65,7 +51,7 @@ const CharacterPage = () => {
           loading={loading}
         />
         <div style={{ padding: "20px 0px" }}>
-          <CharacterList data={characters} loading={loading} />
+          <HouseList data={houses} loading={loading} />
         </div>
         <Pagination
           onChange={(page, pageSize) =>
@@ -85,22 +71,12 @@ const CharacterPage = () => {
           onClose={() => setSelected(null)}
           mask={false}
         >
-          <PageHeader title="Character Detail" />
-          {selected && <CharacterDetail id={selected} />}
-        </Drawer>
-        <Drawer
-          width={640}
-          placement="left"
-          visible={!!selHouse}
-          onClose={() => setSelHouse(null)}
-          mask={false}
-        >
           <PageHeader title="House Detail" />
-          {selHouse && <HouseDetail id={selHouse} />}
+          {selected && <HouseDetail id={selected} />}
         </Drawer>
       </div>
     </div>
   );
 };
 
-export default CharacterPage;
+export default HousePage;

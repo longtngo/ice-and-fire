@@ -1,36 +1,23 @@
 import axios from "axios";
-import { defaultRequestConfig } from "./common.js";
+import {
+  defaultRequestConfig,
+  parseLastPage,
+  parseId,
+  attachIdToListItem,
+} from "./common.js";
 
-export const parseCharacterId = (link) => {
-  const found = link.match(/\/characters\/(\d+)$/);
-  return parseInt(found[1]);
-};
-
-const pageNumberReg = /page=(\d+)/;
-
-const parseLastPage = (link) => {
-  const splits = link.split(",");
-  const lastChunk = splits[splits.length - 1].trim();
-  const found = lastChunk.match(pageNumberReg);
-  return parseInt(found[1]);
-};
-
-const processCharacterList = (characters) => {
-  return characters.map((character) => {
-    character.id = parseCharacterId(character.url);
-    return character;
-  });
-};
+export const characterIdPattern = /\/characters\/(\d+)$/;
+const endpointUrl = "/characters";
 
 export const searchCharacters = (params) => {
   return axios({
     ...defaultRequestConfig,
-    url: "/characters",
+    url: endpointUrl,
     params,
   }).then((resp) => {
     return {
       data: {
-        characters: processCharacterList(resp.data),
+        characters: attachIdToListItem(resp.data, characterIdPattern),
         lastPage: parseLastPage(resp.headers.link),
       },
     };
@@ -40,9 +27,9 @@ export const searchCharacters = (params) => {
 export const getCharacterById = (id) => {
   return axios({
     ...defaultRequestConfig,
-    url: `/characters/${id}`,
+    url: `${endpointUrl}/${id}`,
   }).then((resp) => {
-    resp.data.id = parseCharacterId(resp.data.url);
+    resp.data.id = parseId(resp.data.url, characterIdPattern);
 
     return { data: resp.data };
   });
