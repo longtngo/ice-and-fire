@@ -1,6 +1,6 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { Layout, Menu } from "antd";
-import { navigate, usePath } from "hookrouter";
+import { A, usePath } from "hookrouter";
 
 const { Header } = Layout;
 
@@ -10,23 +10,16 @@ const menuItems = [
 ];
 
 const TopNav = () => {
-  const handleClick = useCallback((e) => {
-    navigate(e.key);
-  }, []);
-
   const path = usePath();
   const selectedKey = menuItems.find((item) => item.route === path)?.route;
 
   return (
     <Header>
-      <Menu
-        onClick={handleClick}
-        theme="dark"
-        mode="horizontal"
-        selectedKeys={[selectedKey]}
-      >
+      <Menu theme="dark" mode="horizontal" selectedKeys={[selectedKey]}>
         {menuItems.map((item) => (
-          <Menu.Item key={item.route}>{item.name}</Menu.Item>
+          <Menu.Item key={item.route}>
+            <A href={item.route}>{item.name}</A>
+          </Menu.Item>
         ))}
       </Menu>
     </Header>
