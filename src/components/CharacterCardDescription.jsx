@@ -1,14 +1,15 @@
 import React from "react";
 
 const CharacterCardDescription = ({ values, fieldName, plural = "s" }) => {
-  let manyValues = values.length > 1;
+  const displayValues = values.filter((value) => !!value);
+  let manyValues = displayValues.length > 1;
   return (
-    <div title={values.join(", ")}>
+    <div title={displayValues.join(", ")}>
       <span>
         {fieldName}
         {`${manyValues ? plural : ""}`}:{" "}
       </span>
-      <span>{values?.[0] || "None"}</span>
+      <span>{displayValues?.[0] || "None"}</span>
       {manyValues ? " ..." : ""}
     </div>
   );
