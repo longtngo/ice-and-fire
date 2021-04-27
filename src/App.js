@@ -1,22 +1,23 @@
 import "./App.css";
 import { Layout } from "antd";
 import CharacterPage from "./pages/CharacterPage";
-import { useRoutes, useRedirect } from "hookrouter";
+import { useRoutes } from "hookrouter";
 import HousePage from "./pages/HousePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import TopNav from "./components/TopNav";
+import LandingPage from "./pages/LandingPage";
 
 const { Footer, Content } = Layout;
 
 const routes = {
-  "/characters": () => <CharacterPage />,
   "/characters/:id": (params) => <CharacterPage id={params?.id} />,
-  "/houses": () => <HousePage />,
+  "/characters": () => <CharacterPage />,
   "/houses/:id": (params) => <HousePage id={params?.id} />,
+  "/houses": () => <HousePage />,
+  "/": () => <LandingPage />,
 };
 
 function App() {
-  useRedirect("/", "/characters");
   const routeResult = useRoutes(routes);
   return (
     <Layout>

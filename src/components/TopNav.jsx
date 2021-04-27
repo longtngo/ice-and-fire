@@ -5,6 +5,7 @@ import { A, usePath } from "hookrouter";
 const { Header } = Layout;
 
 const menuItems = [
+  { route: "/", name: "Home" },
   { route: "/characters", name: "Characters" },
   { route: "/houses", name: "Houses" },
 ];

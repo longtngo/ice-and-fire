@@ -8,7 +8,6 @@ import { searchCharacters } from "../services/characterApi";
 import CharacterDetail from "../components/CharacterDetail";
 import withList from "../components/shared/withList";
 import CharacterCard from "../components/CharacterCard";
-import { navigate } from "hookrouter";
 
 const CharacterList = withList(CharacterCard);
 
@@ -39,18 +38,14 @@ const CharacterPage = ({ id }) => {
   useBus(
     "CHARACTER_SELECTED",
     (event) => {
-      navigate(`characters/${event.payload}`);
+      setSelected(event.payload);
     },
     [setSelected]
   );
 
   return (
     <div>
-      <PageHeader
-        className="site-page-header"
-        title="Characters"
-        subTitle="List of all characters"
-      />
+      <PageHeader title="Characters" subTitle="List of all characters" />
       <div className="page-content">
         <Search
           placeholder="Search Characters By Name"

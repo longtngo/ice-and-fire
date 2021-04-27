@@ -8,7 +8,6 @@ import { searchHouses } from "../services/houseApi";
 import HouseDetail from "../components/HouseDetail";
 import HouseCard from "../components/HouseCard";
 import withList from "../components/shared/withList";
-import { navigate } from "hookrouter";
 
 const HouseList = withList(HouseCard);
 const { Search } = Input;
@@ -35,18 +34,14 @@ const HousePage = ({ id }) => {
   useBus(
     "HOUSE_SELECTED",
     (event) => {
-      navigate(`houses/${event.payload}`);
+      setSelected(event.payload);
     },
     [setSelected]
   );
 
   return (
     <div>
-      <PageHeader
-        className="site-page-header"
-        title="Houses"
-        subTitle="List of all houses"
-      />
+      <PageHeader title="Houses" subTitle="List of all houses" />
       <div className="page-content">
         <Search
           placeholder="Search Houses By Name"
